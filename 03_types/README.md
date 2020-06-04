@@ -322,6 +322,8 @@ panic: runtime error: slice bounds out of range [:3] with capacity 0
 1. Проект из первой задачи
 1. "Дополнение" к нему в виде Pull-Request'а с функциональностью вывода последних трёх транзакций (продемонстрируйте вызов этой функции в `main` или через Example)
 
+В ЛК присылайте ссылку на Pull-Request.
+
 Что можно посмотреть, чтобы успешно выполнить эту задачу:
 1. Встроенные функции `len`, `copy`, `make`
 1. [Slice Tricks](https://github.com/golang/go/wiki/SliceTricks) – сборник различных трюков по работе со слайсами
