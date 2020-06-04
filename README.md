@@ -2,9 +2,11 @@
 
 Важно: [Правила оформления вопросов, сообщений о ошибках и проблемах](report-requirements.md)
 
-Важно: [Инструкция по установке и активации GoLand](goland-installation.md)
-
 Важно: [Инструкция по работе в терминале](terminal.md)
+
+Важно: [Инструкция по установке Go](go-installation.md)
+
+Важно: [Инструкция по установке и активации GoLand](goland-installation.md)
 
 Важно: [Примеры кода из лекций](https://github.com/netology-code/bgo-code)
 
