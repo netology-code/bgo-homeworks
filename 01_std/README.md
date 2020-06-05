@@ -85,9 +85,9 @@ func main() {
 
 ```go
 func main() {
-    balance := 0 // записываете полтора миллиона 
-    transfer := 0 // записываете миллион 
-    total := int32(balance + transfer) // int32() - это преобразование в int32
+	var balance int32 = 0 // 15 миллионов в копейках
+	var transfer int32 = // 10 миллионов в копейках
+	total := balance + transfer // int32 + int32 будет int32
     println(total)
 }
 ```
