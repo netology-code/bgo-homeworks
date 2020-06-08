@@ -84,7 +84,7 @@ func AddTransaction(card *Card, transaction *Transaction) {
 ###### Часть 4. Написать `SumByMCC` (конечно же в пакете `card`), которая имеет следующее объявление:
 
 ```go
-func SumByMCC(transactions []Transaction, mcc []string) int {
+func SumByMCC(transactions []Transaction, mcc []string) int64 {
     // TODO: ваш код
 } 
 ```
@@ -115,7 +115,7 @@ func SumByMCC(transactions []Transaction, mcc []string) int {
   
   А вот для пополнений MCC нет, поскольку это не покупка.
   
-  Кроме того, вы можете объявить свой тип `MCC` на базе типа `string` и использовать его везде вместо `string`. Это будет более профессиональным решением.
+  Кроме того, вы можете объявить свой тип `MCC` на базе типа `string` и использовать его везде вместо `string` (как и `Money` на базе `int64` - но тут вопрос, должен ли этот тип лежать в пакете `card`, возможно, ему место в пакете `money`). Это будет более профессиональным решением.
 </details>
 
 ## Задача №2 - MCC
