@@ -175,8 +175,8 @@ func SumConcurrently(transactions []int64, goroutines int) int64 {
 	for i := 0; i < goroutines; i++ {
 		part := transactions[i*partSize : (i+1)*partSize]
 		go func() {
-            sum := Sum(part)
-            atomic.AddInt64(&total, sum)
+			sum := Sum(part)
+			atomic.AddInt64(&total, sum)
 			wg.Done()
 		}()
 	}
@@ -196,8 +196,8 @@ func SumConcurrently(transactions []int64, goroutines int) int64 {
 	partSize := len(transactions) / goroutines
 	for i := 0; i < goroutines; i++ {
 		go func() {
-            sum := Sum(transactions[i*partSize : (i+1)*partSize]) // <--
-            atomic.AddInt64(&total, sum)
+			sum := Sum(transactions[i*partSize : (i+1)*partSize]) // <--
+			atomic.AddInt64(&total, sum)
 			wg.Done()
 		}()
 	}
@@ -219,9 +219,9 @@ func SumConcurrently(transactions []int64, goroutines int) int64 {
 	partSize := len(transactions) / goroutines
 	for i := 0; i < goroutines; i++ {
 		go func() {
-            fmt.Println(i)
-            sum := Sum(transactions[i*partSize : (i+1)*partSize]) // <--
-            atomic.AddInt64(&total, sum)
+			fmt.Println(i)
+			sum := Sum(transactions[i*partSize : (i+1)*partSize]) // <--
+			atomic.AddInt64(&total, sum)
 			wg.Done()
 		}()
 	}
@@ -243,8 +243,8 @@ func SumConcurrently(transactions []int64, goroutines int) int64 {
 	partSize := len(transactions) / goroutines
 	for i := 0; i < goroutines; i++ {
 		go func(part []int64) { <--
-            sum := Sum()
-            atomic.AddInt64(&total, sum)
+			sum := Sum()
+			atomic.AddInt64(&total, sum)
 			wg.Done()
 		}(transactions[i*partSize : (i+1)*partSize]) <--
 	}
