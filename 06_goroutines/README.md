@@ -135,135 +135,20 @@ func SumConcurrently(transactions []int64, goroutines int) int64 {
 
 Автотесты писать не нужно.
 
-## Задача №3 – Типичная ошибка
+## Типичная ошибка
 
-### Легенда
+**Важно**: это не ДЗ, сдавать его не нужно. Вы лишь должны прочитать этот раздел и убедиться, что поняли его.
 
-Мы по-прежнему работаем с транзакциями (как на лекции, только вам нужно оформлять транзакции не в виде чисел, а в виде структур, как вы делали в предыдущих ДЗ).
-
-На лекции мы с вами рассматривали вот такой пример:
-
+Сравним три цикла:
 ```go
-func SumConcurrently(transactions []int64, goroutines int) int64 {
-	wg := sync.WaitGroup{}
-	wg.Add(goroutines)
-
-	total := int64(0)
-	partSize := len(transactions) / goroutines
-	for i := 0; i < goroutines; i++ {
-		part := transactions[i*partSize : (i+1)*partSize]
-		go func() {
-			total += Sum(part) // FIXME: shared memory bug, discuss later
-			wg.Done()
-		}()
-	}
-
-	wg.Wait()
-	return total
-}
-```
-
-Мы его немного модернизируем, чтобы не было ошибки о которой написано в FIXME (об этом будет следующая лекция):
-
-```go
-func SumConcurrently(transactions []int64, goroutines int) int64 {
-	wg := sync.WaitGroup{}
-	wg.Add(goroutines)
-
-	total := int64(0)
-	partSize := len(transactions) / goroutines
-	for i := 0; i < goroutines; i++ {
-		part := transactions[i*partSize : (i+1)*partSize]
-		go func() {
-			sum := Sum(part)
-			atomic.AddInt64(&total, sum)
-			wg.Done()
-		}()
-	}
-
-	wg.Wait()
-	return atomic.LoadInt64(&total)
-}
-```
-
-Так вот в чём вопрос: один из ваших товарищей сказал вам, что переменная `part` лишняя, можно написать просто вот так:
-```go
-func SumConcurrently(transactions []int64, goroutines int) int64 {
-	wg := sync.WaitGroup{}
-	wg.Add(goroutines)
-
-	total := int64(0)
-	partSize := len(transactions) / goroutines
-	for i := 0; i < goroutines; i++ {
-		go func() {
-			sum := Sum(transactions[i*partSize : (i+1)*partSize]) // <--
-			atomic.AddInt64(&total, sum)
-			wg.Done()
-		}()
-	}
-
-	wg.Wait()
-	return atomic.LoadInt64(&total)
-}
-```
-
-На самом деле, это неправильно. Всё дело в том, что значения "замкнутых" переменных вычисляются в момент вызова функции (т.е. когда эта функция запустится на исполнение).
-
-Можете ради интереса поставить `fmt.Println(i)` и убедиться, что в некоторых запусках `i` будет дублироваться:
-```go
-func SumConcurrently(transactions []int64, goroutines int) int64 {
-	wg := sync.WaitGroup{}
-	wg.Add(goroutines)
-
-	total := int64(0)
-	partSize := len(transactions) / goroutines
-	for i := 0; i < goroutines; i++ {
-		go func() {
-			fmt.Println(i)
-			sum := Sum(transactions[i*partSize : (i+1)*partSize]) // <--
-			atomic.AddInt64(&total, sum)
-			wg.Done()
-		}()
-	}
-
-	wg.Wait()
-	return atomic.LoadInt64(&total)
-}
-```
-
-Решения тут два:
-1. То, которое мы рассмотрели на лекции: создавать `part` внутри цикла
-1. Передавать аргументом в вызываемую функцию (т.к. аргументы вычисляются сразу):
-```go
-func SumConcurrently(transactions []int64, goroutines int) int64 {
-	wg := sync.WaitGroup{}
-	wg.Add(goroutines)
-
-	total := int64(0)
-	partSize := len(transactions) / goroutines
-	for i := 0; i < goroutines; i++ {
-		go func(part []int64) { <--
-			sum := Sum()
-			atomic.AddInt64(&total, sum)
-			wg.Done()
-		}(transactions[i*partSize : (i+1)*partSize]) <--
-	}
-
-	wg.Wait()
-	return atomic.LoadInt64(&total)
-}
-```
-
-Если вам сложно с такими большими кусками кода, то сравните вот такие три цикла:
-```go
-    // bad
+	// 1. bad
 	for i := 0; i < 100; i++ {
 		go func() {
 			fmt.Println(i)
 		}()
 	}
  
-    // ok
+	// 2. ok
 	for i := 0; i < 100; i++ {
 		j := i
 		go func() {
@@ -271,7 +156,7 @@ func SumConcurrently(transactions []int64, goroutines int) int64 {
 		}()
 	}
 
-    // ok
+	// 3. ok
 	for i := 0; i < 100; i++ {
 		go func(j int) {
 			fmt.Println(j)
@@ -279,19 +164,74 @@ func SumConcurrently(transactions []int64, goroutines int) int64 {
 	}
 ```
 
-Так что же нужно сделать? Напишите автотесты на все три варианта, которые бы показывали, что вариант, предложенный вашим коллегой-оптимизатором, не правильный.
+Вроде большой разницы между первым и вторым нет, а третий вообще переусложнён.
 
-Сразу скажем, что слайс со всеми единицами уже не подойдёт.
+На самом деле, разница есть и большая. Первый цикл будет работать неправильно (вы встретите дубликаты при выводе, хотя не должны были бы).
 
-<details>
-    <summary>Подсказка</summary>
-    
-    Возможно, стоит сделать "части" отличающимися по сумме, например, в первой части у всех транзакций стоимость будет 1, во второй - 2 и т.д.
-    
-    Может это как-то снизит вероятность того, что при неправильном `i` в замыкании общая сумма не сойдётся? 
-</details>
+Всё дело в том, что значения "замкнутых" переменных вычисляются в момент вызова функции (т.е. когда эта функция запустится на исполнение, она найдёт переменную и возьмёт из неё то значение, которое там хранится сейчас).
 
-Итого, у вас должно быть: оформленный проект с пакетами и автотестами, выложенный в репозиторий на GitHub.
+Для простоты представим, что все код `fmt.Println(i)` запустится тогда, когда цикл завершился:
 
+#### Для первого цикла:
+```go
+func main() {
+	// 1. bad
+	for i := 0; i < 100; i++ {
+		go func() {
+			time.Sleep(time.Second) // специально вставили задержку
+			fmt.Println(i)
+		}()
+	}
+	time.Sleep(10 * time.Second) // без WaitGroup просто задержка
+}
+```
 
-Один тест должен падать, показывая, что идеи вашего коллеги не верны.
+Это значит, что в момент запуска `fmt.Println(i)` будет осуществлён поиск `i`. Несмотря на то, что мы вроде как уже вышли из цикла, переменная `i` не уничтожилась (поскольку к ней обращаются из вложенной функции).
+
+Переменная `i` создавалась всего одна, поэтому все горутины будут обращаться к ней. Поскольку они будут обращаться к ней уже после завершения цикла, то в `i` будет значение 100.
+
+Это важно запомнить - одна из типичных ошибок. GoLand будет вас о ней предупрежать:
+
+![](pic/capture.png)
+
+#### Для второго цикла:
+```go
+func main() {
+	// 1. bad
+	for i := 0; i < 100; i++ {
+		j := i	
+		go func() {
+			time.Sleep(time.Second) // специально вставили задержку
+			fmt.Println(j)
+		}()
+	}
+	time.Sleep(10 * time.Second) // без WaitGroup просто задержка
+}
+```
+
+Это значит, что в момент запуска `fmt.Println(i)` будет осуществлён поиск `j`. Несмотря на то, что мы вроде как уже вышли из всех итераций цикла, переменная `j` не уничтожилась (поскольку к ней обращаются из вложенной функции).
+
+Но переменная `j` создавалась не один раз, а ровно столько, сколько было итераций цикла. Поэтому у каждой горутины будет своя `j`, в которой будет сохранено значение `i` на момент прохождения цикла.
+
+Таким образом, всё отработает корректно.
+
+#### Для третьего цикла:
+```go
+func main() {
+	// 1. bad
+	for i := 0; i < 100; i++ {
+		go func(j int) {
+			time.Sleep(time.Second) // специально вставили задержку
+			fmt.Println(j)
+		}(i)
+	}
+	time.Sleep(10 * time.Second) // без WaitGroup просто задержка
+}
+```
+
+В данном случае, на каждой итерации цикла `i` передаётся в качестве аргумента в функцию (а значит, копируется), соответственно функция при вызове не будет ничего искать во внешней области видимости.
+
+В функцию попадёт верное значение (т.к. значение будет передаваться в момент вычисления аргумента).
+
+Таким образом, всё отработает корректно.
+
