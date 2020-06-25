@@ -183,21 +183,21 @@ return result
 
 ```go
 func makeTransactions() []int64 {
-	const users = 10_000
-	const transactionsPerUser = 10_000
-	const transactionAmount = 1_00
-	transactions := make([]Transaction, users * transactionsPerUser)
-	for index := range transactions {
-		switch index % 100 {
-			case 0:
-				transactions[index] = x// Например, каждая 100-ая транзакция в банке от нашего юзера в категории такой-то
-			case 20:
-				transactions[index] = y// Например, каждая 120-ая транзакция в банке от нашего юзера в категории такой-то
-			default:
-				transactions[index] = z// Транзакции других юзеров, нужны для "общей" массы
-		}
-	}
-	return transactions
+    const users = 10_000
+    const transactionsPerUser = 10_000
+    const transactionAmount = 1_00
+    transactions := make([]Transaction, users * transactionsPerUser)
+    for index := range transactions {
+        switch index % 100 {
+            case 0:
+                transactions[index] = x// Например, каждая 100-ая транзакция в банке от нашего юзера в категории такой-то
+            case 20:
+                tansactions[index] = y// Например, каждая 120-ая транзакция в банке от нашего юзера в категории такой-то
+            default:
+            	transactions[index] = z// Транзакции других юзеров, нужны для "общей" массы
+        }
+    }
+    return transactions
 }
 ```
 
@@ -277,26 +277,20 @@ go test -bench=. -benchtime=1000x ./...
 
 Tracing - это возможность посмотреть, как выполнялась наш код, а именно нас будут интересовать запуск горутин и описание блокировок.
 
-Мы рассмотрим включение tracing'а двумя способами:
-1. Через тесты
-1. В `main` вашего кода
-
-### Tracing через тесты
-
-Включить tracing через тесты достаточно просто: просто скопируйте приведённый ниже код в ваш файл `main.go` (в самое начало):
+Включить tracing через достаточно просто: просто скопируйте приведённый ниже код в ваш файл `main.go` (в самое начало функции `main`):
 ```go
 f, err := os.Create("trace.out")
 if err != nil {
-	log.Fatal(err)
+    log.Fatal(err)
 }
 defer func() {
-	if err := f.Close(); err != nil {
-		log.Print(err)
-	}
+    if err := f.Close(); err != nil {
+        log.Print(err)
+    }
 }()
 err = trace.Start(f)
 if err != nil {
-	log.Fatal(err)
+    log.Fatal(err)
 }
 defer trace.Stop()
 ```
