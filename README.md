@@ -30,7 +30,7 @@
 
 ## Блок 3. IO (ввод-вывод, networking)
 
-3.1. [ ] [Работа с файлами (io, bufio, ioutil)](08_files)
+3.1. [x] [Работа с файлами (io, bufio, ioutil)](08_files)
 
 3.2. [ ] [Работа с сетью, HTTP 1.1, HTTP 2](09_network)
 
