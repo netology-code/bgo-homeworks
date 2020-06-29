@@ -2,6 +2,7 @@
 Thumbs.db*
 .DS_Store*
 HELP.md
+TODO.md
 
 # Binaries for programs and plugins
 *.exe
