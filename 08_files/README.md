@@ -239,6 +239,11 @@ func main() {
 	// Важно: передаём указатель, чтобы функция смогла записать данные
 	err = json.Unmarshal(encoded, &decoded)
 	log.Printf("%#v", decoded)
+    // если вдруг, у вас будет указатель:
+    // var decoded *Transaction
+    // то передавать придётся указатель на указатель
+    // чтобы из функции можно было в исходный указатель записать данные:
+	// err = json.Unmarshal(encoded, &decoded)
 }
 ```
 
