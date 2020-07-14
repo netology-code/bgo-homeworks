@@ -31,7 +31,7 @@
 
 Но, к сожалению, этот сервис возвращает ответ в кодировке cp1251, а с кодировками мы работать ещё не умеем.
 
-Поэтому мы для вас подготовили статичную версию - вам нужно загружать данные методом GET по адресу: https://raw.githubusercontent.com/netology-code/bgo-homeworks/master/10_client/assets/currencies.xml
+Поэтому мы для вас подготовили статичную версию - вам нужно загружать данные методом GET по адресу: https://raw.githubusercontent.com/netology-code/bgo-homeworks/master/10_client/assets/daily.xml
 
 Информация приходит вот в таком виде:
 ```xml
