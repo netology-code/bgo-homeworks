@@ -35,7 +35,7 @@
 
 Информация приходит вот в таком виде:
 ```xml
-<?xml version="1.0" encoding="windows-1251"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <ValCurs Date="14.07.2020" name="Foreign Currency Market">
     <Valute ID="R01010">
         <NumCode>036</NumCode>
