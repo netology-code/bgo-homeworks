@@ -237,3 +237,17 @@ EXPOSE 9999
 ## Документация
 
 Конечно же, мы рассмотрели лишь малую часть возможностей. Ознакомиться с документацией и примерами вы можете [на официальном сайте Docker](https://docs.docker.com/engine/reference/builder/).
+
+## Scratch
+
+Если есть желание потренироваться в использовании `scratch`, то вот `Dockerfile` для него:
+
+```dockerfile
+FROM scratch
+
+ADD bank /app/
+
+ENTRYPOINT ["/app/bank"]
+
+EXPOSE 9999
+```
