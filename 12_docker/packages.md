@@ -48,6 +48,8 @@ jobs:
 
       - name: Build binary for docker image
         run: go build -v -o bank ./cmd/bank
+        env:
+          CGO_ENABLED: 0
 
       - name: List
         run: ls -la
