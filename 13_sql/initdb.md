@@ -8,52 +8,11 @@ Volumes - механизм, позволяющий "пробрасывать" к
 
 Изображение с сайта https://docs.docker.com.
 
-Прежде чем разбираться, как это делать, вам нужно понять, что и зачем вам вообще подключать в `volumes`. 
-
-Например, есть такой HTTP-сервер [nginx](https://nginx.org/ru/)*. Его задача - обслуживание HTTP-запросов.
-
-Примечание:* на самом деле, это не только http-сервер, но ещё и куча всего, но пока нам это мало интересно. Мы его будем активно использовать на следующем курсе.
-
-Самый простой пример: вы вбиваете в адресную строку браузера URL, веб-сервер вам отдаёт страницу, которая и отображается браузером.
-
-Чтобы веб-сервер мог отдать какую-то страницу, она у него должна быть.
-
-Вот код нашей страницы (скопируйте и сохраните его в файле `index.html`).
-
-```html
-<!doctype html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-<meta http-equiv="X-UA-Compatible" content="ie=edge">
-<title>Hello Docker!</title>
-</head>
-<body>
-  <h1>Hello Docker!</h1>
-</body>
-</html>
-```
-
-В "тяжёлом" случае, мы можем создать простую html-страницу (вы это делали в курсе по git), скачать/установить nginx и настроить его... Но зачем? Есть же Docker.
-
-Идём на Docker Hub и забиваем nginx:
-
-![](./pic/nginx.png)
-
-Но nginx'у же нужно как-то отдать нашу страницу? Вот тут на помощь и приходят Volumes - мы можем положить нашу страницу в каталог на локальный диск и "скормить" её контейнеру в виде Volume.
-
-На странице конкретного образа написано, какие Volumes и как рекомендуется подключать:
-
-![](./pic/nginx-volumes.png)
-
-Т.е. флаг `-v` дальше пишется локальный путь, после чего пишется путь внутри контейнера (он обычно указывается в документацию на контейнер).
-
-К сожалению (а может, и к счастью), в документации на образы пишутся примеры только для Unix-подобных систем, т.е. в них путь указывается как `/path/to/directory`, поэтому в следующих разделах мы разберёмся как это делать.
+Прежде чем разбираться, как это делать, вам нужно понять, что и зачем вам вообще подключать в volumes. 
 
 ## Инициализация контейнеров
 
-Многие образа на своих страницах предлагают использовать специальный каталог для начальной инициализации (т.е. если туда положить файлы нужного формата, то база данных при старте их будет считывать).
+Многие образа на своих страницах предлагают использовать специальный каталог для начальной инициализации (т.е. если туда положить файлы нужного формата, то база данных при старте их будет считывать и выполнять).
 
 Postgres:
 
@@ -71,13 +30,55 @@ Mongo:
 
 Обратите внимание, что файлы, найденные в этом каталоге, исполняются в алфавитном порядке. Поэтому, если хотите обеспечить порядок выполнения, называйте файлы 01_xxx.sql, 02_xxx.sql и т.д.
 
-Если вы всё сделаете правильно, то при запуске контейнера в логах контейнера увидите:
+Если вы всё сделаете правильно, то при запуске контейнера в логах контейнера увидите (о том, как запускать - читайте ниже):
 
 ```
 postgresdb_1_XXXXXXXX | /usr/local/bin/docker-entrypoint.sh: running /docker-entrypoint-initdb.d/schema.sql
 postgresdb_1_XXXXXXXX | CREATE TABLE
 postgresdb_1_XXXXXXXX | CREATE TABLE
 ```
+
+## Docker (Linux)
+
+Здесь всё достаточно просто:
+1. Создаёте в каталоге проекта каталог `docker-entrypoint-initdb.d`
+1. Помещаете файлы `data.sql` и `schema.sql` в каталог `docker-entrypoint-initdb.d`
+1. Запускаете Docker Container командой `docker container run -p 5432:5432 -v /home/admin/projects/sql/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d:ro -e POSTGRES_PASSWORD=pass -e POSTGRES_USER=app -e POSTGRES_DB=db postgres:12.3-apline`
+
+Где:
+1. `/home/admin/projects/sql/docker-entrypoint-initdb.d` - абсолютный путь до каталога `docker-entrypoint-initdb.d` в вашем проекте*.
+1. `ro` - каталог доступен только для чтения
+
+Примечание*: можно сократить запись, используя возможности shell, но мы в целях упрощения этого делать не стали.
+
+## Docker Desktop (Windows)
+
+Здесь тоже всё не сложно (если вы используете WSL2, если не используйте - читайте ниже):
+1. Создаёте в каталоге проекта каталог `docker-entrypoint-initdb.d`
+1. Помещаете файлы `data.sql` и `schema.sql` в каталог `docker-entrypoint-initdb.d`
+1. Запускаете Docker Container командой `docker container run -p 5432:5432 -v c:/Users/admin/projects/sql/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d:ro -e POSTGRES_PASSWORD=pass -e POSTGRES_USER=app -e POSTGRES_DB=db postgres:12.3-apline`
+
+Где:
+1. `c:/Users/admin/projects/sql/docker-entrypoint-initdb.d` - абсолютный путь до каталога `docker-entrypoint-initdb.d` в вашем проекте*.
+1. `ro` - каталог доступен только для чтения
+
+### WSL 2
+
+Если ваша установка Docker не использует WSL 2 (Windows Subsystem for Linux), то в настройках Docker нужно включить File Sharing.
+
+Как определить, использует или нет: заходите в настройки Docker:
+
+![](pic/docker-wsl2.png)
+
+Если флажок напротив `Use the WSL 2 based Engine` не выставлен, то значит не используете.
+
+Переходите на вкладку `Resources` -> `File Sharing` и через кнопку + добавляете `C:\Users`, чтобы всё выглядело, как на экране
+
+![](pic/docker-filesharing.png)
+
+После чего нажимаете `Apply & Restart`.
+
+Далее работаете по той же схеме, что и с Docker с WSL2.
 
 ## Docker Toolbox (Windows)
 
@@ -103,54 +104,39 @@ postgresdb_1_XXXXXXXX | CREATE TABLE
 
 Важно: Docker будет подключать только каталоги из `C:\Users`, поэтому мы рекомендуем вам в папке вашего пользователся создать каталог `projects` и работать там.
 
-Открываете ваш проект в IDEA и вводите в консоли (`Alt + F12`):
+Открываете ваш проект в GoLand и вводите в консоли (`Alt + F12`):
 
 ```
-docker container run --name demo-nginx -p 8080:80 -v /c/Users/admin/projects/html:/usr/share/nginx/html:ro -d nginx
+docker container run -p 5432:5432 -v /c/Users/admin/projects/sql/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d:ro -e POSTGRES_PASSWORD=pass -e POSTGRES_USER=app -e POSTGRES_DB=db postgres:12.3-alpine
 ```
 
-Обратите внимание, что `Users` было написано с большой буквы.
+Обратите внимание, что `Users` было написано с большой буквы и путь именно `/c/`, а не `C:\`.
 
 ## Docker Compose
 
-В обоих случаях с Docker Compose ситуация будет следующая (для Docker Toolbox важно, чтобы ваш проект находился в одном из подкаталогов `C:\Users`):
+В всех случаях нам приходилось вводить абсолютный путь до каталога с sql-файлами. С Docker Compose всё будет гораздо проще (для Docker Toolbox важно, чтобы ваш проект находился в одном из подкаталогов `C:\Users`, а для Docker Desktop для Windows без WSL2 в одном из каталогов из списка про File Sharing):
 
 ```
 version: '3.8'
 services:
-  http:
-    image: nginx:latest
+  db:
+    image: postgres:12.3-alpine
     ports:
-      - 8080:80
+      - 5432:5432
     volumes:
-    - ./html:/usr/share/nginx/html:ro
+      - ./docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d:ro
 ```
 
-И в консоли запускаете `docker-compose up`
+Как вы видите, 
+
+Таким образом, вам достаточно:
+1. Создать в каталоге проекта файл `docker-compose.yml` с указанным содержимым
+1. Создать в каталоге проекта каталог `docker-entrypoint-initdb.d`
+1. Поместить файлы `data.sql` и `schema.sql` в каталог `docker-entrypoint-initdb.d`
+
+И в консоли запускаете `docker-compose up`.
 
 **Обратите внимание**: контейнер не удаляется, пока вы его сами не удалите (например, через `docker-compose rm`), а значит база данных и все изменения файловой системы внутри контейнера будут те же (что выполнились при создании контейнера).
 
 О чём речь? Вы сделали в первый раз `docker-compose up` - создался и запустился новый контейнер. Теперь, если вы сделаете `docker-compose down` (или остановите через `Ctrl + C`) и затем снова `docker-compose up` - то создастся не новый контейнер, а запустится старый (который был остановлен). При этом никакие скрипты из `/docker-entrypoint-initdb.d` выполняться не будут. В качестве самого простого решения просто удаляйте контейнеры через `docker-compose rm` после их остановки. 
-
-## Docker Compose и плагин GoLand (для Docker Toolbox и Windows)
-
-Если вы хотите использовать Plugin для GoLand и при запуске получаете вот такую картину:
-
-![](pic/docker-plugin.png)
-
-То вам нужно щёлкнуть на кнопке с тремя точками:
-
-![](pic/docker-plugin-setup.png)
-
-И заменить `tcp` на `https`:
-
-![](pic/docker-plugin-setup-https.png)
-
-После чего удостовериться, что `docker-compose.yml` по-прежнему выбран (если слетел, то выберите его руками):
-
-![](pic/docker-plugin-compose-file.png)
-
-После этого активируется панелька `Services`, в которой вы и сможете всё настроить:
-
-![](pic/idea-services.png)
 

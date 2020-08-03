@@ -1,0 +1,4 @@
+CREATE TABLE TESTS (
+    id BIGSERIAL PRIMARY KEY,
+    comment TEXT NOT NULL
+);
