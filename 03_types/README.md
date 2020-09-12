@@ -306,7 +306,7 @@ firstOps := card.Transactions[0:3] // первые три, начиная с 0, 
 
 Для операции слайсинга есть ряд сокращений:
 1. Если начинаем с нуля, то 0 можно не указывать: `card.Transactions[:3]` равносильно `card.Transactions[0:3]`
-1. Если идём до конца, то "конец" можно не указывать: `card.Transactions[3:0]` равносильно `card.Transactions[3:len(card.Transactions)]`
+1. Если идём до конца, то "конец" можно не указывать: `card.Transactions[3:]` равносильно `card.Transactions[3:len(card.Transactions)]`
 1. Исходя из первых двух: `card.Transactions[:]` равносильно `card.Transactions[0:len(card.Transactions)]`
 
 Ключевой момент: если в `card.Transactions` не было элементов, либо он был пустым (nil-слайс), мы получим ошибку выполнения:
