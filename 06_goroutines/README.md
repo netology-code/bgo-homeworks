@@ -309,7 +309,6 @@ func main() {
 #### Для второго цикла:
 ```go
 func main() {
-	// 1. bad
 	for i := 0; i < 100; i++ {
 		j := i	
 		go func() {
@@ -330,7 +329,6 @@ func main() {
 #### Для третьего цикла:
 ```go
 func main() {
-	// 1. bad
 	for i := 0; i < 100; i++ {
 		go func(j int) {
 			time.Sleep(time.Second) // специально вставили задержку
