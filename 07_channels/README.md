@@ -185,8 +185,8 @@ return result
 
 ```go
 func makeTransactions() []int64 {
-    const users = 10_000
-    const transactionsPerUser = 10_000
+    const users = 1_000
+    const transactionsPerUser = 1_000
     const transactionAmount = 1_00
     transactions := make([]Transaction, users * transactionsPerUser)
     for index := range transactions {
