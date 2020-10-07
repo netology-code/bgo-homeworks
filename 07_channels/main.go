@@ -34,7 +34,7 @@ func merge(channels []<-chan int64) <-chan int64 {
 }
 
 func main() {
-	count := 999_999_999 // всего транзакций
+	count := 9_999_999 // всего транзакций
 	transactions := make([]int64, count)
 	for i := range transactions {
 		transactions[i] = 1_00 // каждая транзакция 1 рубль
