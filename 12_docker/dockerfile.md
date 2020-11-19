@@ -49,7 +49,7 @@
 Итого наш `Dockerfile` на данном этапе должен выглядеть вот так:
 
 ```dockerfile
-FROM alpine:3.7
+FROM alpine:3
 ```
 
 ## `RUN`
@@ -57,7 +57,7 @@ FROM alpine:3.7
 Инструкция `RUN` позволяет нам выполнить команды внутри контейнера, например, создать каталог, внутри которого будет находиться наш исполняемый файл:
 
 ```dockerfile
-FROM alpine:3.7
+FROM alpine:3
 
 RUN mkdir /app
 ```
@@ -74,7 +74,7 @@ docker build .
 
 ```
 Sending build context to Docker daemon  7.752MB
-Step 1/2 : FROM alpine:3.7
+Step 1/2 : FROM alpine:3
 3.7: Pulling from library/alpine
 5d20c808ce19: Pull complete 
 Digest: sha256:8421d9a84432575381bfabd248f1eb56f3aa21d9d7cd2511583c68c9b7511d10
@@ -98,7 +98,7 @@ REPOSITORY     TAG        IMAGE ID          CREATED             SIZE
 
 ```
 Sending build context to Docker daemon  7.752MB
-Step 1/2 : FROM alpine:3.7
+Step 1/2 : FROM alpine:3
  ---> 6d1ef012b567
 Step 2/2 : RUN mkdir /app
  ---> Using cache
@@ -137,7 +137,7 @@ go build -o bank ./cmd/bank
 Dockerfile:
 
 ```dockerfile
-FROM alpine:3.7
+FROM alpine:3
 
 ADD bank /app/
 ```
@@ -151,7 +151,7 @@ ADD bank /app/
 Инструкция `ENTRYPOINT` используется для непосредственного указания исполняемого файла:
 
 ```dockerfile
-FROM alpine:3.7
+FROM alpine:3
 
 ADD bank /app/
 
@@ -170,7 +170,7 @@ docker build . -t bank
 
 ```
 Sending build context to Docker daemon  7.699MB
-Step 1/4 : FROM alpine:3.7
+Step 1/4 : FROM alpine:3
  ---> 6d1ef012b567
 Step 2/4 : ADD bank /app/
  ---> a2f19f6b81c7
@@ -207,7 +207,7 @@ docker container run -p 9999:9999 bank
 Есть выход лучше - инструкция `EXPOSE`. Она используется для документирования того, на каком порту внутри контейнера наше приложение будет ожидать подключений (по умолчанию TCP):
 
 ```dockerfile
-FROM alpine:3.7
+FROM alpine:3
 
 ADD bank /app/
 
@@ -219,7 +219,7 @@ EXPOSE 9999
 ## Итоговый `Dockerfile`
 
 ```dockerfile
-FROM alpine:3.7
+FROM alpine:3
 
 ADD bank /app/
 
