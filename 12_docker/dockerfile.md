@@ -106,11 +106,11 @@ Step 2/2 : RUN mkdir /app
 Successfully built c1b8bc976056
 ```
 
-## `ADD` 
+## `COPY` 
 
-Инструкция `ADD` предоставляет вам возможность добавить из локальной файловой системы (с вашего компьютера) файлы в образ.
+Инструкция `COPY` предоставляет вам возможность добавить из локальной файловой системы (с вашего компьютера) файлы в образ.
 
-Формат команды следующий: `ADD src dst`, где `src` - это исходный файл, архив или URL, а `dst` - это целевой файл или каталог.
+Формат команды следующий: `COPY src dst`, где `src` - это исходный файл, архив или URL, а `dst` - это целевой файл или каталог.
 
 В нашем случае, нам нужно скопировать наш исполняемый файл внутрь образа.
 
@@ -139,23 +139,23 @@ Dockerfile:
 ```dockerfile
 FROM alpine:3.7
 
-ADD bank /app/
+COPY bank /app/
 ```
 
-Обратите внимание, мы избавились от `RUN`, поскольку `ADD` сам создаст необходимые каталоги.
+Обратите внимание, мы избавились от `RUN`, поскольку `COPY` сам создаст необходимые каталоги.
 
 Примечание: мы пока не рассматриваем вопросы безопасности, к ним вернёмся на курсе микросервисов.
 
-## `ENTRYPOINT`
+## `CMD`
 
-Инструкция `ENTRYPOINT` используется для непосредственного указания исполняемого файла:
+Инструкция `CMD` используется для непосредственного указания исполняемого файла:
 
 ```dockerfile
 FROM alpine:3.7
 
-ADD bank /app/
+COPY bank /app/
 
-ENTRYPOINT ["/app/bank"]
+CMD ["/app/bank"]
 ```
 
 Теперь можно собрать и запустить, но давайте поговорим о следующей штуке - работать с id'шниками не совсем удобно, хотелось бы назначить образу имя (у того же `postgres` имя `postgres`). Сделать это можно с помощью флага `-t name:tag`, либо просто `-t name` (тогда тег будет `latest`).
@@ -172,9 +172,9 @@ docker build . -t bank
 Sending build context to Docker daemon  7.699MB
 Step 1/4 : FROM alpine:3.7
  ---> 6d1ef012b567
-Step 2/4 : ADD bank /app/
+Step 2/4 : COPY bank /app/
  ---> a2f19f6b81c7
-Step 3/4 : ENTRYPOINT ["/app/bank"]
+Step 3/4 : CMD ["/app/bank"]
  ---> Running in 36e50dd4669e
 Removing intermediate container 36e50dd4669e
  ---> 2df2c4847897
@@ -209,7 +209,7 @@ docker container run -p 9999:9999 bank
 ```dockerfile
 FROM alpine:3.7
 
-ADD bank /app/
+COPY bank /app/
 
 ENTRYPOINT ["/app/bank"]
 
@@ -221,9 +221,9 @@ EXPOSE 9999
 ```dockerfile
 FROM alpine:3.7
 
-ADD bank /app/
+COPY bank /app/
 
-ENTRYPOINT ["/app/bank"]
+CMD ["/app/bank"]
 
 EXPOSE 9999
 ```
@@ -245,9 +245,9 @@ EXPOSE 9999
 ```dockerfile
 FROM scratch
 
-ADD bank /app/
+COPY bank /app/
 
-ENTRYPOINT ["/app/bank"]
+CMD ["/app/bank"]
 
 EXPOSE 9999
 ```
